@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: ${{ fromJson(needs.setup.outputs.themes) }}
+        theme: ${{ fromJson(needs.setup.outputs.themes) }}
 
     steps:
       - uses: actions/checkout@v2
