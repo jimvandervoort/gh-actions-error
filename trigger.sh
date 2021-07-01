@@ -8,5 +8,5 @@ while true; do
   git commit -m "Trigger another commit"
   git push
   
-  sleep 120
+  sleep 40
 done
