@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  - push
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      themes: ${{ steps.set.outputs.themes }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set themes
+        id: set
+        run: echo ::set-output name=themes::$(cat themes.json | jq -c '.')
+
+  build-frontend:
+    name: Build Frontend
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        name: ${{ fromJson(needs.setup.outputs.themes) }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '15.x'
+
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Upload build dist
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: builds/${{ matrix.theme }}/
